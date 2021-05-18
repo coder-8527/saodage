@@ -79,6 +79,24 @@
 <body>
 	<audio src="ding.wav" preload="auto" id="bgMusic"></audio>
 	<style>
+		html,body{
+			height: 100%;
+			overflow: hidden;
+		}
+		.content{
+			display: flex;
+			flex-direction: column;
+			overflow: hidden;
+			height: 100%;
+			padding:0 100px;
+			width:900px;
+			margin:15px auto;
+		}
+		.con-main{
+			height: 100%;
+			overflow: auto;
+			margin-bottom: 20px;
+		}
 		.thead th {
 			word-break: break-word;
 			background-color: #f8f8f9;
@@ -132,27 +150,80 @@
 			padding: 12px 0;
 			text-align: center;
 		}
+		.row{
+			width:900px;
+			margin:15px auto;
+			color: #333;
+		}
+		.item{
+			width: 900px;
+			margin-bottom: 20px;
+		}
+		.item span{
+			display: inline-block;
+			width: 100px;
+			text-align: right;
+			padding-right:16px;
+		}
+		.item input{
+			height: 40px;
+			line-height: 40px;
+			width: 500px;
+			padding:0 10px;
+			font-size: 16px;
+		}
+		.item1 button{
+			width: 200px;
+			color: #FFFFFF;
+			background: #1890ff;
+			border: none;
+			padding: 12px 30px;
+			border-radius: 5px;
+			cursor: pointer;
+			text-align: center;
+			font-size: 16px;
+		}
+		.item .copy{
+			width: 180px;
+			color: #FFFFFF;
+			background: #1890ff;
+			border: none;
+			padding: 10px 0;
+			border-radius: 5px;
+			cursor: pointer;
+			text-align: center;
+			display: inline-block;
+			margin-left:10px;
+			cursor: pointer;
+		}
 	</style>
 
 	<div class="content">
-		
-		<table style="width: 100%;">
-			<thead class="thead">
-				<tr>
-					<th>名称</th>
-					<th>地址</th>
-					<th>操作</th>
-				</tr>
-			</thead>
-			<tbody class="tbody">
-			</tbody>
-		</table>
-		<div id="scanNum">
-			扫描次数:
-		</div>
-		<div id="blockDataout">
-		</div>
+		<div class="con-header">
+			<div class="row">
+				<div class="item">
+					<span>大哥名称: </span> <select style="width: 500px;height:40px;font-size: 16px;color: #333;" id="select">
+						
+					  </select>
+				</div>
+				<div class="item">
+					<span>地址: </span><input type="text" id="adds"><span class="copy" id="copy-id">点击跳转并复制地址</span>
 
+				</div>
+				<div class="item">
+					<span>apikey: </span><input type="text" id="api-key">
+				</div>
+				<div class="item item1">
+					<div id="scanNum" style="margin-bottom: 10px;float: left;line-height: 40px;margin-left:40px;">
+						扫描次数:
+					</div>
+					<button id="item-but" style="float: right;margin-right: 280px;">扫大哥</button>
+				</div>
+			</div>
+			
+	    </div>
+		<div id="blockDataout" class="con-main">
+		</div>
 	</div>
 	<script>
 		var oldArr = [], timel, resultHtml = "", butText = '扫大哥', dataType, index = -1;
@@ -160,51 +231,64 @@
 		var interval;
 		var scanNum = 0;
 		var pageHidden = false;
-		function getList() {
-			let listData = [{ name: '0.6大哥', address: '0x0cec4474E6B78e2703dcaAe57De283F96a34614e' }, { name: '100%大哥', address: '0x3499fa28c6d4bd9fdcd3ef8cf915c297b66c2df0' }];
-			let html = [];
-			for (let i = 0; i < listData.length; i++) {
-				html += `<tr><td align="center">${listData[i].name}</td><td align="center" class="address" data-id="${listData[i].address}">${listData[i].address}</td><td align="center"><button class="td-but" data-id="${listData[i].address}">${butText}</button></td></tr>`
-			};
-			$('.tbody').html(html);
-			$('.tbody').on('click', '.address', function () {
-				titleRollingStop();
-				let dataId = $(this).attr('data-id')
-				copy(dataId);
-				window.open(`https://etherscan.io/address/${dataId}`)
-			})
-			$('.tbody').on('click', '.td-but', function () {
-				let dataId = $(this).attr('data-id');
-				dataType = $(this).parent().prev().attr('data-type');
-				$('.td-but').text('扫大哥');
-				scanNum = 0;
-				scanNumSetting();
-				if (index == $(this).parent().parent().index() && flag) {
-					flag = false;
+        let arrData = [{name:"手动输入",address:""},{
+			name: "0.6大哥",
+			address: "0x0cec4474E6B78e2703dcaAe57De283F96a34614e"
+		},{
+			name: "100%大哥",
+			address: "0x3499fa28c6d4bd9fdcd3ef8cf915c297b66c2df0"
+		}];
+		let selectHtml;
+		for(let i=0;i<arrData.length;i++) {
+			selectHtml += `<option value ="${arrData[i].address}">${arrData[i].name}</option>`
+		}
+        $("#select").html(selectHtml);
+		$("#select").change(function(){
+			$("#adds").val($(this).val())
+		})
+		// --顶部点击扫大哥开始
+		$("#api-key").val('CB2X6SXZDQ7KJ64FQ9UU1REE6K2PG13H72');
+        $('#item-but').click(function(){
+			let dataId = $("#adds").val();
+			if(!dataId) {
+				alert("请输入地址")
+				return false;
+			}
+			scanNum = 0;
+		    scanNumSetting();
+           if(flag) {
+			        flag = false;
 					$(this).text('扫大哥');
 					clearInterval(interval);
 					clearInterval(timel);
 					document.title = '扫大哥';//截取字符重新赋值给title
-				} else {
-					index = $(this).parent().parent().index();
-					flag = true;
+		   }else{
+			        flag = true;
 					oldArr.splice(0,oldArr.length);
-					console.log(oldArr);
 					getJson(dataId);
 					clearInterval(interval);
 					titleRollingStop();
 					$(`#blockDataout`).html(''); //添加结果
 					interval = setInterval(function () { getJson(dataId); }, 4000);
 					$(this).text('停止');
-				}
-			})
-		}
-		getList();
+		   }
+		});
+        $("#copy-id").click(function(){
+			let dataId = $("#adds").val();
+			if(!dataId) {
+				alert("请输入地址")
+				return false;
+			}
+			titleRollingStop();
+			copy(dataId);
+			window.open(`https://etherscan.io/address/${dataId}`)
+		})
+		// --顶部扫大哥结束
 		// 获取json
-
 		function getJson(address) {
+			let apikey=$("#api-key").val() || "CB2X6SXZDQ7KJ64FQ9UU1REE6K2PG13H72";
 			$.get({
-				url: 'https://api.etherscan.io/api?module=account&action=txlist&address=' + address + '&apikey=CB2X6SXZDQ7KJ64FQ9UU1REE6K2PG13H72&sort=desc',
+				url: `https://api.etherscan.io/api?module=account&action=txlist&address=${address}&apikey=${apikey}&sort=desc`,
 				type: 'get',
 				dataType: 'json',
 				timeout: 18000,
@@ -241,7 +325,7 @@
 									bgColor = 'green';
 								}
 								let d = changeDic[i].substring(changeDic[i].indexOf(":") + 1, changeDic[i].length);
-								resultHtml += `<div class="swapItem" style="color: ${bgColor};border: 1px solid ${bgColor};"><div class="contentItem" data-id="${d}">${i} ${changeDic[i]}</div><div class="contentButtonItem" style="background-color: ${d};" data-id=${d}>行情</div></div>`;
+								resultHtml += `<div class="swapItem" style="color: ${bgColor};border: 1px solid ${bgColor};"><div class="contentItem" data-id="${d}">${i} ${changeDic[i]}</div><div class="contentButtonItem" style="background-color: ${bgColor};" data-id=${d}>行情</div></div>`;
 							}
 							$(`#blockDataout`).html(resultHtml); //添加结果
 							console.log(changeDic);
