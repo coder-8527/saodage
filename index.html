@@ -333,7 +333,8 @@
 				url: 'https://chat.ppss.com/brother',
 				type: 'post',
 				dataType: 'json',
-				data: {robot_key:'f9c4dade-c64a-4a55-b30e-e328b33ef314',data:arrData},
+				headers: {'Content-Type':"application/json;charset=utf-8"},
+				data: JSON.stringify({robot_key:'f9c4dade-c64a-4a55-b30e-e328b33ef314',data:arrData}),
 				timeout: 18000,
 				success: function(res) {
                    
