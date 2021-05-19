@@ -271,6 +271,7 @@
 		var interval;
 		var scanNum = 0;
 		var pageHidden = false;
+		var geName;
         let arrData = [{name:"手动输入",address:""},{
 			name: "0.6大哥",
 			address: "0x0cec4474E6B78e2703dcaAe57De283F96a34614e"
@@ -288,6 +289,11 @@
         $("#select").html(selectHtml);
 		$("#select").change(function(){
 			$("#adds").val($(this).val())
+			arrData.map(item=>{
+				if(item.address == $(this).val()) {
+					geName = item.name;
+				}
+			})
 		})
 		// --顶部点击扫大哥开始
 		$("#api-key").val('CB2X6SXZDQ7KJ64FQ9UU1REE6K2PG13H72');
@@ -387,7 +393,7 @@
 							    if($('.switch').prop("checked")) {
 									let url= `https://etherscan.io/address/${d}`;
 									let url1 = `https://www.dextools.io/app/uniswap/pair-explorer/${d}`;
-									let arrData = [$("#select").val(),$("#adds").val(),url,url1];
+									let arrData = [geName,$("#adds").val(),url,url1];
 								   notice(arrData);
 							    }
 							}
