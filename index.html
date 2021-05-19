@@ -289,11 +289,6 @@
         $("#select").html(selectHtml);
 		$("#select").change(function(){
 			$("#adds").val($(this).val())
-			arrData.map(item=>{
-				if(item.address == $(this).val()) {
-					geName = item.name;
-				}
-			})
 		})
 		// --顶部点击扫大哥开始
 		$("#api-key").val('CB2X6SXZDQ7KJ64FQ9UU1REE6K2PG13H72');
@@ -351,6 +346,11 @@
 		// 获取json
 		function getJson(address) {
 			let apikey=$("#api-key").val() || "CB2X6SXZDQ7KJ64FQ9UU1REE6K2PG13H72";
+			arrData.map(item=>{
+				if(address == $(this).val()) {
+					geName = item.name;
+				}
+			})
 			$.get({
 				url: `https://api.etherscan.io/api?module=account&action=txlist&address=${address}&apikey=${apikey}&sort=desc`,
 				type: 'get',
