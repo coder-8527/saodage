@@ -196,6 +196,45 @@
 			margin-left:10px;
 			cursor: pointer;
 		}
+		/* Switch开关样式 */
+        input[type='checkbox'].switch {
+            outline: none;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            position: relative;
+            width: 40px;
+            height: 20px;
+            background: #ccc;
+            border-radius: 10px;
+            transition: border-color .3s, background-color .3s;
+        }
+
+        input[type='checkbox'].switch::after {
+            content: '';
+            display: inline-block;
+            width: 1rem;
+            height: 1rem;
+            border-radius: 50%;
+            background: #fff;
+            box-shadow: 0, 0, 2px, #999;
+            transition: .4s;
+            top: 2px;
+            position: absolute;
+            left: 2px;
+        }
+
+        input[type='checkbox'].switch:checked {
+            background: rgb(19, 206, 102);
+        }
+
+        /* 当input[type=checkbox]被选中时：伪元素显示下面样式 位置发生变化 */
+        input[type='checkbox'].switch:checked::after {
+            content: '';
+            position: absolute;
+            left: 55%;
+            top: 2px;
+        }
 	</style>
 
 	<div class="content">
@@ -217,7 +256,8 @@
 					<div id="scanNum" style="margin-bottom: 10px;float: left;line-height: 40px;margin-left:40px;">
 						扫描次数:
 					</div>
-					<button id="item-but" style="float: right;margin-right: 280px;">扫大哥</button>
+					<input type="checkbox" class="switch" style="float: right;margin-right:280px;margin-top:10px;" value="0">
+					<button id="item-but" style="float: right;margin-right: 80px;">扫大哥</button>
 				</div>
 			</div>
 			
@@ -283,6 +323,20 @@
 			copy(dataId);
 			window.open(`https://etherscan.io/address/${dataId}`)
 		})
+		 // 通知
+
+		 function notice(arrData) {
+			 $.post({
+				url: 'http://chat.ppss.com/brother',
+				type: 'post',
+				dataType: 'json',
+				data: {robot_key:'f9c4dade-c64a-4a55-b30e-e328b33ef314',data:arrData},
+				timeout: 18000,
+				success: function(res) {
+                   
+				}
+			 })
+		 }
 		// --顶部扫大哥结束
 		// 获取json
 		function getJson(address) {
@@ -326,7 +380,14 @@
 								}
 								let d = changeDic[i].substring(changeDic[i].indexOf(":") + 1, changeDic[i].length);
 								resultHtml += `<div class="swapItem" style="color: ${bgColor};border: 1px solid ${bgColor};"><div class="contentItem" data-id="${d}">${i} ${changeDic[i]}</div><div class="contentButtonItem" style="background-color: ${bgColor};" data-id=${d}>行情</div></div>`;
+							    if($('.switch').prop("checked")) {
+									let url= `https://etherscan.io/address/${d}`;
+									let url1 = `https://www.dextools.io/app/uniswap/pair-explorer/${d}`;
+									let arrData = [$("#select").val(),$("#adds").val(),url,url1];
+								   notice(arrData);
+							    }
 							}
+							// true,开启
 							$(`#blockDataout`).html(resultHtml); //添加结果
 							console.log(changeDic);
 							if(!isEmptyObject(changeDic)){
