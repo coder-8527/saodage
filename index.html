@@ -347,7 +347,7 @@
 		function getJson(address) {
 			let apikey=$("#api-key").val() || "CB2X6SXZDQ7KJ64FQ9UU1REE6K2PG13H72";
 			arrData.map(item=>{
-				if(address == $(this).val()) {
+				if(item.address == address) {
 					geName = item.name;
 				}
 			})
