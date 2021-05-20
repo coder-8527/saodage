@@ -308,7 +308,7 @@
 					document.title = '扫大哥';//截取字符重新赋值给title
 		   }else{
 			        flag = true;
-					oldArr.splice(0,oldArr.length);
+					oldArr = [];
 					getJson(dataId);
 					clearInterval(interval);
 					titleRollingStop();
@@ -363,6 +363,7 @@
 							oldArr = newData;
 						} else {
 							// 判断是否有新的交易
+							if(newData[0].blockNumber == oldArr[0].blockNumber) {return false;}
 							var changeNum = newData.length - oldArr.length;
 							var changeDic = {};
 							for (var i = 0; i < changeNum; ++i) {
