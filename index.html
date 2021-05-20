@@ -266,7 +266,7 @@
 		</div>
 	</div>
 	<script>
-		var oldArr = [], timel, resultHtml = "", butText = '扫大哥', dataType, index = -1;
+		var oldArr = [], timel, resultHtml = "", butText = '扫大哥', dataType, index = -1; defaultAddress=null;
 		var flag = false;
 		var interval;
 		var scanNum = 0;
@@ -312,6 +312,7 @@
 					getJson(dataId);
 					clearInterval(interval);
 					titleRollingStop();
+					defaultAddress = dataId;
 					$(`#blockDataout`).html(''); //添加结果
 					interval = setInterval(function () { getJson(dataId); }, 4000);
 					$(this).text('停止');
@@ -361,16 +362,24 @@
 					scanNumSetting();
 					if (data && data.status == 1) {
 						var newData = data.result;
+						// 防止前面的请求太慢替换新的数据
+						if(defaultAddress != address) {return false;}
+
 						if (oldArr.length == 0) {
+							//第一次什么都不做
 							oldArr = newData;
 						} else {
+							var haveNewDeal = true;
 							// 判断是否有新的交易
 							if(newData[0].blockNumber == oldArr[0].blockNumber) {
 								if(newData.length != oldArr.length){
 									oldArr = newData;
 								}
-								return false;
+								haveNewDeal = false;
 							}
+
+							if(haveNewDeal == false){return haveNewDeal};
+							// 处理新交易
 							var changeNum = newData.length - oldArr.length;
 							var changeDic = {};
 							for (var i = 0; i < changeNum; ++i) {
