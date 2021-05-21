@@ -396,9 +396,11 @@
 											var direction = "卖出";
 											sell = input.substring(input.length - 104, input.length - 64);
 										}
+										let timeStr = new Date(dataObj['timeStamp']+"000").Format('yyyy-MM-dd HH:mm:ss')
 										// 按区块编号存入字典 因为多条数据可能属于同一笔交易
-										changeDic[dataObj['blockNumber']] = direction + ':' + '0x' + sell;
+										changeDic[dataObj['blockNumber']] = timeStr + direction + ':' + '0x' + sell;
 									}
+
 								}
 							}
 							for (let i in changeDic) {
@@ -407,9 +409,8 @@
 									bgColor = 'green';
 								}
 								// 增加时间
-								let curDate = new Date().Format('yyyy-MM-dd HH:mm:ss')
 								let d = changeDic[i].substring(changeDic[i].indexOf(":") + 1, changeDic[i].length);
-								resultHtml += `<div class="swapItem" style="color: ${bgColor};border: 1px solid ${bgColor};"><div class="contentItem" data-id="${d}">${curDate} ${i} ${changeDic[i]}</div><div class="contentButtonItem" style="background-color: ${bgColor};" data-id=${d}>行情</div></div>`;
+								resultHtml += `<div class="swapItem" style="color: ${bgColor};border: 1px solid ${bgColor};"><div class="contentItem" data-id="${d}">${i} ${changeDic[i]}</div><div class="contentButtonItem" style="background-color: ${bgColor};" data-id=${d}>行情</div></div>`;
 							    if($('.switch').prop("checked")) {
 									let url= `https://etherscan.io/address/${d}`;
 									let url1 = `https://www.dextools.io/app/uniswap/pair-explorer/${d}`;
