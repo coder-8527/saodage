@@ -4,77 +4,6 @@
 <head>
 	<script src="jquery.js"></script>
 	<script src="utils.js"></script>
-	<!-- <script>
-		$(function () {
-			getBigBrotherData();
-		});
-
-
-		var oldArr = [];
-		function getBigBrotherData(address) {
-			$.ajax({
-				url: 'http://api.etherscan.io/api?module=account&action=txlist&address=' + address + '&apikey=CB2X6SXZDQ7KJ64FQ9UU1REE6K2PG13H72&sort=desc',
-				type: 'get',
-				dataType: 'json',
-				timeout: 18000,
-				success: function (data, textStatus) {
-					console.log(data);
-					if (data && data.status == 1) {
-						var newData = data.result;
-						if (oldArr.length == 0) {
-							oldArr = newData;
-							console.log('第一次运行')
-						} else {
-							// 判断是否有新的交易
-							var changeNum = newData.length - oldArr.length;
-							var changeDic = {};
-							for (var i = 0; i < changeNum; ++i) {
-								var dataObj = newData[i];
-								if (dataObj['isError'] == 0) {
-									var input = dataObj['input'];
-
-									// 截取input后40位
-									var sell = input.substring(input.length - 40, input.length);
-									// 如果为c02aaa39b223fe8d0a0e5c4f27ead9083c756cc2 说明为卖单
-									if (sell != "undefined" && sell.length > 10) {
-										var direction = "买入";
-										if (sell == "c02aaa39b223fe8d0a0e5c4f27ead9083c756cc2") {
-											var direction = "卖出";
-											sell = input.substring(input.length - 104, input.length - 64);
-										}
-										// 按区块编号存入字典 因为多条数据可能属于同一笔交易
-										changeDic[dataObj['blockNumber']] = direction + ':' + '0x' + sell;
-									}
-								}
-							}
-							console.log(changeDic);
-							// $("#blockDatain").html(changeDic['in'].substring(9,changeDic['in'].length));
-							$.each(changeDic, function (key, value) {
-								var bgColor = 'red';
-								if (value.indexOf("买入") != -1) {
-									bgColor = 'green';
-								}
-								var div1 = '<div class="swapItem"  style="background: ' + bgColor + '; margin-top: 5px;">';
-								var div2 = '</div>';
-								let key1 = '' + key;
-								$("#blockDataout").append(div1 + key1 + ':' + value + div2);
-							})
-
-							oldArr = data.result;
-						}
-
-
-
-						// $("#blockData").html(data.message);
-						// $("#blockData").val(data);
-					}
-				},
-				error: function (XMLHttpRequest, textStatus, errorThrown) {
-					console.log(textStatus);
-				}
-			});
-		};
-	</script> -->
 </head>
 
 <body>
@@ -236,10 +165,43 @@
             left: 55%;
             top: 2px;
         }
+		.add-box{
+			position: fixed;
+			left: 50%;
+			top: 50%;
+			height: 200px;
+			border-radius: 5px;
+			background: #fff;
+			width:700px;
+			margin-top: -100px;
+			margin-left: -350px;
+			z-index: 10;
+			padding: 60px 20px;
+			display: none;
+		}
+		.add-box .item{margin-bottom: 25px;}
+		.add-box .item1{
+			text-align: center;
+		}
+		.mask{
+			position: fixed;
+			left: 0;
+			top: 0;
+			background: rgba(0,0,0,.6);
+			height: 100%;
+			width: 100%;
+			z-index: 9;
+			display: none;
+		}
 	</style>
 
 	<div class="content">
 		<div class="con-header">
+			<div class="row">
+				<div class="item1">
+					<button id="add-but">添加大哥地址</button>
+				</div>
+		   </div>
 			<div class="row">
 				<div class="item">
 					<span>大哥名称: </span> <select style="width: 500px;height:40px;font-size: 16px;color: #333;" id="select">
@@ -266,6 +228,22 @@
 		<div id="blockDataout" class="con-main">
 		</div>
 	</div>
+
+	<!-- 添加大哥地址弹框 -->
+	<div class="add-box">
+		<div class="item">
+			<span>大哥名称: </span><input type="text" id="item-name">
+		</div>
+		<div class="item">
+			<span>地址: </span><input type="text" id="item-adds">
+		</div>
+		<div class="item1">
+			<button id="add-submit" onclick="addSubmit()">提交</button>
+		</div>
+		<div style="position:absolute;right:20px;top:20px;color: #f00;cursor: pointer;" id="close">关闭</div>
+	</div>
+	<!-- 遮罩层 -->
+	<div class="mask"></div>
 	<script>
 		var oldArr = [], timel, resultHtml = "", butText = '扫大哥', dataType, index = -1; defaultAddress=null;
 		var flag = false;
@@ -273,23 +251,67 @@
 		var scanNum = 0;
 		var pageHidden = false;
 		var geName;
-        let arrData = [{name:"手动输入",address:""},{
-			name: "0.6大哥",
-			address: "0x0cec4474E6B78e2703dcaAe57De283F96a34614e"
-		},{
-			name: "100%大哥",
-			address: "0x3499fa28c6d4bd9fdcd3ef8cf915c297b66c2df0"
-		},{
-			name: "小单大哥",
-			address: "0x2df9609b7db9cc74b53908dbd629c30f676138c3"
-		}];
-		let selectHtml;
-		for(let i=0;i<arrData.length;i++) {
-			selectHtml += `<option value ="${arrData[i].address}">${arrData[i].name}</option>`
-		}
-        $("#select").html(selectHtml);
+        let arrData = [];
+       // 打开添加大哥弹框
+	   $("#add-but").click(function(){
+          $(".add-box").show();
+		  $(".mask").show();
+	   });
+	   // 关闭弹框和遮罩层
+	   $("#close").click(function(){
+		  $(".add-box").hide();
+		  $(".mask").hide();
+	   });
+        // 获取大哥地址
+		function getAddress() {
+			$.get({
+				url: 'https://www.13bj.com/getBrother',
+				dataType: 'json',
+				headers: {'Content-Type':"application/json;charset=utf-8"},
+				timeout: 18000,
+				success: function(res) {
+                   if(res.code === 200) {
+					arrData = [{name:"手动输入",addr:""},...res.data];
+					let selectHtml;
+						for(let i=0;i<arrData.length;i++) {
+							selectHtml += `<option value ="${arrData[i].addr}">${arrData[i].name}</option>`
+						}
+						$("#select").html(selectHtml);
+				   }
+				}
+			})
+		};
+		getAddress();
+		// 提交添加大哥
+		function addSubmit() {
+			
+			if(!$("#item-name").val().trim() || !$("#item-adds").val().trim()) {
+              alert('不能为空');
+			  return;
+			}
+			$.post({
+              url: 'https://www.13bj.com/setBrother',
+			  dataType: 'json',
+			  headers: {'Content-Type':"application/json;charset=utf-8"},
+			  data: JSON.stringify({
+				  name: $("#item-name").val(),
+				  addr: $("#item-adds").val()
+			  }),
+			  timeout: 18000,
+			  success: function(res) {
+                if(res.code === 200) {
+					alert('添加成功');
+					getAddress();
+					$('.add-box').hide();
+					$('.mask').hide();
+				}
+			  }
+			})
+		};
+
+
 		$("#select").change(function(){
-			$("#adds").val($(this).val())
+			$("#adds").val($(this).val());
 		})
 		// --顶部点击扫大哥开始
 		$("#api-key").val('CB2X6SXZDQ7KJ64FQ9UU1REE6K2PG13H72');
@@ -333,7 +355,7 @@
 
 		 function notice(arrData) {
 			 $.post({
-				url: 'https://chat.ppss.com/brother',
+				url: 'https://www.13bj.com/notify',
 				type: 'post',
 				dataType: 'json',
 				headers: {'Content-Type':"application/json;charset=utf-8"},
@@ -349,7 +371,7 @@
 		function getJson(address) {
 			let apikey=$("#api-key").val() || "CB2X6SXZDQ7KJ64FQ9UU1REE6K2PG13H72";
 			arrData.map(item=>{
-				if(item.address == address) {
+				if(item.addr == address) {
 					geName = item.name;
 				}
 			})
@@ -396,7 +418,21 @@
 											var direction = "卖出";
 											sell = input.substring(input.length - 104, input.length - 64);
 										}
+										if (sell == "ffffffffffffffffffffffffffffffffffffffff") {
+											var direction = "授权";
+											sell = input.substring(input.length - 104, input.length - 64);
+										}
 										let timeStr = new Date(dataObj['timeStamp']+"000").Format('yyyy-MM-dd HH:mm:ss')
+										if(dataObj.timeStamp) {
+                                           let returnTime = new Date(timeStr).getTime();
+										   let currentTime = new Date().getTime();
+										   let time = (currentTime - returnTime) / 1000;
+										   if(time > 30) {
+                                              return;
+										   }
+										}else{
+											return;
+										}
 										// 按区块编号存入字典 因为多条数据可能属于同一笔交易
 										changeDic[dataObj['blockNumber']] = timeStr + direction + ':' + '0x' + sell;
 									}
