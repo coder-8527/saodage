@@ -13,19 +13,38 @@
 			height: 100%;
 			overflow: hidden;
 		}
+		.app-main{
+			display: flex;
+			height: 100%;
+			justify-content: center;
+		}
 		.content{
 			display: flex;
 			flex-direction: column;
 			overflow: hidden;
 			height: 100%;
-			padding:0 100px;
-			width:900px;
-			margin:15px auto;
+			padding-right:50px;
+			width:800px;
+			margin:15px 0;
+		}
+		.list{
+			width: 700px;
+			height: 100%;
+			display: flex;
+			flex-direction: column;
+			overflow: hidden;
+			height: 100%;
+		}
+		.table-con{
+			height: 100%;
+			overflow: auto;
+			margin-bottom: 20px;
+			position: relative;
 		}
 		.con-main{
 			height: 100%;
 			overflow: auto;
-			margin-bottom: 20px;
+			margin-bottom: 30px;
 		}
 		.thead th {
 			word-break: break-word;
@@ -81,12 +100,12 @@
 			text-align: center;
 		}
 		.row{
-			width:900px;
+			width:800px;
 			margin:15px auto;
 			color: #333;
 		}
 		.item{
-			width: 900px;
+			width: 800px;
 			margin-bottom: 20px;
 		}
 		.item span{
@@ -98,7 +117,7 @@
 		.item input{
 			height: 40px;
 			line-height: 40px;
-			width: 500px;
+			width: 400px;
 			padding:0 10px;
 			font-size: 16px;
 		}
@@ -194,17 +213,13 @@
 			display: none;
 		}
 	</style>
-
+<div class="app-main">
 	<div class="content">
 		<div class="con-header">
-			<div class="row">
-				<div class="item1">
-					<button id="add-but">添加大哥地址</button>
-				</div>
-		   </div>
+			
 			<div class="row">
 				<div class="item">
-					<span>大哥名称: </span> <select style="width: 500px;height:40px;font-size: 16px;color: #333;" id="select">
+					<span>大哥名称: </span> <select style="width: 400px;height:40px;font-size: 16px;color: #333;" id="select">
 						
 					  </select>
 				</div>
@@ -223,12 +238,35 @@
 					<button id="item-but" style="float: right;margin-right: 80px;">扫大哥</button>
 				</div>
 			</div>
-			
 	    </div>
 		<div id="blockDataout" class="con-main">
+			
 		</div>
 	</div>
-
+	<div class="list">
+		<div style="margin: 10px 0;">
+			<div class="item1">
+				<button id="add-but">添加大哥地址</button>
+			</div>
+	   </div>
+	   <div class="table-con">
+			<table style="width: 100%;">
+				<thead class="thead">
+					<tr>
+						<th>名称</th>
+						<th>地址</th>
+						<th>操作</th>
+					</tr>
+				</thead>
+				<tbody class="tbody">
+				</tbody>
+			</table>
+			<div class="load-box" style="position:absolute;left:0;top:0;height:100%;width:100%;background: rgba(0,0,0,.6);display: none;">
+				<img src="1.gif" alt="" style="position: absolute;left:50%;top:50%;">
+			</div>
+	    </div>
+	</div>
+</div>
 	<!-- 添加大哥地址弹框 -->
 	<div class="add-box">
 		<div class="item">
@@ -252,6 +290,7 @@
 		var pageHidden = false;
 		var geName;
         let arrData = [];
+		let listData = [];
        // 打开添加大哥弹框
 	   $("#add-but").click(function(){
           $(".add-box").show();
@@ -264,24 +303,49 @@
 	   });
         // 获取大哥地址
 		function getAddress() {
+			$('.load-box').show();
 			$.get({
 				url: 'https://www.13bj.com/getBrother',
 				dataType: 'json',
 				headers: {'Content-Type':"application/json;charset=utf-8"},
 				timeout: 18000,
 				success: function(res) {
+					$('.load-box').hide();
                    if(res.code === 200) {
 					arrData = [{name:"手动输入",addr:""},...res.data];
-					let selectHtml;
+					listData = res.data;
+					let selectHtml,html=[];
 						for(let i=0;i<arrData.length;i++) {
-							selectHtml += `<option value ="${arrData[i].addr}">${arrData[i].name}</option>`
+							selectHtml += `<option value ="${arrData[i].addr}">${arrData[i].name}</option>`;
+						}
+						for(let j=0;j<listData.length;j++) {
+							html += `<tr><td align="center">${listData[j].name}</td><td align="center" class="address" data-id="${listData[j].addr}">${listData[j].addr}</td><td align="center"><button class="td-but" data-id="${listData[j].addr}">删除</button></td></tr>`
 						}
 						$("#select").html(selectHtml);
+						$('.tbody').html(html);
 				   }
 				}
 			})
 		};
 		getAddress();
+		// 列表删除大哥
+		$(".tbody").on('click','.td-but',function(){
+            let index = $(this).parent().parent().index();
+			console.log(index)
+			let names = [listData[index].name];
+			$.post({
+				url: "https://www.13bj.com/removeBrother",
+				dataType: 'json',
+				headers: {'Content-Type':"application/json;charset=utf-8"},
+				timeout: 18000,
+				data: JSON.stringify({names: names}),
+				success: function(res) {
+                   if(res.code == 200) {
+					getAddress();
+				   }
+				}
+			})
+		});
 		// 提交添加大哥
 		function addSubmit() {
 			
