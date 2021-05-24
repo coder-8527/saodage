@@ -423,7 +423,7 @@
 											sell = input.substring(input.length - 104, input.length - 64);
 										}
 										let timeStamp = dataObj['timeStamp'] * 1000
-										let timeStr = new Date(timeStamp).Format('yyyy-MM-dd HH-mm-ss')
+										let timeStr = new Date(timeStamp).Format('yyyy-MM-dd HH点mm分ss秒')
 										console.log('now get time:', timeStr)
 										if(dataObj.timeStamp) {
                                            let returnTime = timeStamp
@@ -451,13 +451,15 @@
 								let rv = changeDic[i].split(':')
 								let d = rv[1]
 								let timeStr = rv[2]
+								// 内容
+								let content = rv[0] + ":" + rv[1]
 								console.log('===> 获取区块数据:', d, timeStr)
 								//let d = changeDic[i].substring(changeDic[i].indexOf(":") + 1, changeDic[i].length);
-								resultHtml += `<div class="swapItem" style="color: ${bgColor};border: 1px solid ${bgColor};"><div class="contentItem" data-id="${d}">${timeStr} ${i} ${changeDic[i]}</div><div class="contentButtonItem" style="background-color: ${bgColor};" data-id=${d}>行情</div></div>`;
+								resultHtml += `<div class="swapItem" style="color: ${bgColor};border: 1px solid ${bgColor};"><div class="contentItem" data-id="${d}">${i} ${content}</div><div class="contentButtonItem" style="background-color: ${bgColor};" data-id=${d}>行情</div></div>`;
 							    if($('.switch').prop("checked")) {
 									let url= `https://etherscan.io/address/${d}`;
 									let url1 = `https://www.dextools.io/app/uniswap/pair-explorer/${d}`;
-									let arrData = [geName,changeDic[i],'详情:',url,'行情:',url1];
+									let arrData = [geName,timeStr, content,'详情:',url,'行情:',url1];
 								   notice(arrData);
 							    }
 							}
