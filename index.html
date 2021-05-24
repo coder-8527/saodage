@@ -1,782 +1,622 @@
 <html>
-  <title>扫大哥</title>
+<title>扫大哥</title>
 
-  <head>
-    <script src="jquery.js"></script>
-    <script src="utils.js"></script>
-  </head>
+<head>
+	<script src="jquery.js"></script>
+	<script src="utils.js"></script>
+</head>
 
-  <body>
-    <audio src="ding.wav" preload="auto" id="bgMusic"></audio>
-    <style>
-      html,
-      body {
-        height: 100%;
-        overflow: hidden;
-      }
-      .content {
-        display: flex;
-        flex-direction: column;
-        overflow: hidden;
-        height: 100%;
-        padding: 0 100px;
-        width: 900px;
-        margin: 15px auto;
-      }
-      .con-main {
-        height: 100%;
-        overflow: auto;
-        margin-bottom: 20px;
-      }
-      .thead th {
-        word-break: break-word;
-        background-color: #f8f8f9;
-        color: #515a6e;
-        height: 40px;
-        font-size: 13px;
-      }
-
-      .tbody td {
-        border-top: 1px solid #ddd;
-      }
-
-      .tbody td {
-        padding: 12px 0;
-        min-width: 0;
-        -webkit-box-sizing: border-box;
-        box-sizing: border-box;
-        text-overflow: ellipsis;
-        vertical-align: middle;
-        position: relative;
-      }
-
-      .td-but {
-        color: #ffffff;
-        background: #1890ff;
-        border: none;
-        padding: 10px 30px;
-        border-radius: 5px;
-        cursor: pointer;
-      }
-
-      .swapItem {
-        overflow: hidden;
-        zoom: 1;
-        border-radius: 5px;
-      }
-      .contentItem {
-        float: left;
-        width: 90%;
-        margin-right: 20px;
-        padding: 12px 0;
-        border-radius: 5px;
-        text-indent: 10px;
-      }
-      .contentButtonItem {
-        overflow: hidden;
-        zoom: 1;
-        color: #fff;
-        background: #000;
-        border: none;
-        padding: 12px 0;
-        text-align: center;
-      }
-      .row {
-        width: 900px;
-        margin: 15px auto;
-        color: #333;
-      }
-      .item {
-        width: 900px;
-        margin-bottom: 20px;
-      }
-      .item span {
-        display: inline-block;
-        width: 100px;
-        text-align: right;
-        padding-right: 16px;
-      }
-      .item input {
-        height: 40px;
-        line-height: 40px;
-        width: 500px;
-        padding: 0 10px;
-        font-size: 16px;
-      }
-      .item1 button {
-        width: 200px;
-        color: #ffffff;
-        background: #1890ff;
-        border: none;
-        padding: 12px 30px;
-        border-radius: 5px;
-        cursor: pointer;
-        text-align: center;
-        font-size: 16px;
-      }
-      .item .copy {
-        width: 180px;
-        color: #ffffff;
-        background: #1890ff;
-        border: none;
-        padding: 10px 0;
-        border-radius: 5px;
-        cursor: pointer;
-        text-align: center;
-        display: inline-block;
-        margin-left: 10px;
-        cursor: pointer;
-      }
-      /* Switch开关样式 */
-      input[type="checkbox"].switch {
-        outline: none;
-        appearance: none;
-        -webkit-appearance: none;
-        -moz-appearance: none;
-        position: relative;
-        width: 40px;
-        height: 20px;
-        background: #ccc;
-        border-radius: 10px;
-        transition: border-color 0.3s, background-color 0.3s;
-      }
-
-      input[type="checkbox"].switch::after {
-        content: "";
-        display: inline-block;
-        width: 1rem;
-        height: 1rem;
-        border-radius: 50%;
-        background: #fff;
-        box-shadow: 0, 0, 2px, #999;
-        transition: 0.4s;
-        top: 2px;
-        position: absolute;
-        left: 2px;
-      }
-
-      input[type="checkbox"].switch:checked {
-        background: rgb(19, 206, 102);
-      }
-
-      /* 当input[type=checkbox]被选中时：伪元素显示下面样式 位置发生变化 */
-      input[type="checkbox"].switch:checked::after {
-        content: "";
-        position: absolute;
-        left: 55%;
-        top: 2px;
-      }
-      .add-box {
-        position: fixed;
-        left: 50%;
-        top: 50%;
-        height: 200px;
-        border-radius: 5px;
-        background: #fff;
-        width: 700px;
-        margin-top: -100px;
-        margin-left: -350px;
-        z-index: 10;
-        padding: 60px 20px;
-        display: none;
-      }
-      .add-box .item {
-        margin-bottom: 25px;
-      }
-      .add-box .item1 {
-        text-align: center;
-      }
-      .mask {
-        position: fixed;
-        left: 0;
-        top: 0;
-        background: rgba(0, 0, 0, 0.6);
-        height: 100%;
-        width: 100%;
-        z-index: 9;
-        display: none;
-      }
-    </style>
-
-    <div class="content">
-      <div class="con-header">
-        <div class="row">
-          <div class="item1">
-            <button id="add-but">添加大哥地址</button>
-          </div>
-        </div>
-        <div class="row">
-          <div class="item">
-            <span>大哥名称: </span>
-            <select
-              style="width: 500px; height: 40px; font-size: 16px; color: #333"
-              id="select"
-            ></select>
-          </div>
-          <div class="item">
-            <span>地址: </span><input type="text" id="adds" /><span
-              class="copy"
-              id="copy-id"
-              >点击跳转并复制地址</span
-            >
-          </div>
-          <div class="item">
-            <span>apikey: </span><input type="text" id="api-key" />
-          </div>
-          <div class="item item1">
-            <div
-              id="scanNum"
-              style="
-                margin-bottom: 10px;
-                float: left;
-                line-height: 40px;
-                margin-left: 40px;
-              "
-            >
-              扫描次数:
-            </div>
-            <div style="float: right; margin-right: 280px; margin-top: 10px">
-              <div style="float: left; padding-left: 10px">微信推送:</div>
-              <input type="checkbox" class="switch" value="0" />
-            </div>
-            <button id="item-but" style="float: right; margin-right: 80px">
-              扫大哥
-            </button>
-          </div>
-        </div>
-      </div>
-      <div id="blockDataout" class="con-main"></div>
-    </div>
-
-    <!-- 添加大哥地址弹框 -->
-    <div class="add-box">
-      <div class="item">
-        <span>大哥名称: </span><input type="text" id="item-name" />
-      </div>
-      <div class="item">
-        <span>地址: </span><input type="text" id="item-adds" />
-      </div>
-      <div class="item1">
-        <button id="add-submit" onclick="addSubmit()">提交</button>
-      </div>
-      <div
-        style="
-          position: absolute;
-          right: 20px;
-          top: 20px;
-          color: #f00;
-          cursor: pointer;
-        "
-        id="close"
-      >
-        关闭
-      </div>
-    </div>
-    <!-- 遮罩层 -->
-    <div class="mask"></div>
-    <script
-      src="https://cdn.ethers.io/lib/ethers-5.0.umd.min.js"
-      type="text/javascript"
-    ></script>
-
-    <script>
-      var oldArr = [],
-        timel,
-        resultHtml = "",
-        butText = "扫大哥",
-        dataType,
-        index = -1;
-      defaultAddress = null;
-      var flag = false;
-      var interval;
-      var scanNum = 0;
-      var pageHidden = false;
-      var geName;
-      let arrData = [];
-      // 打开添加大哥弹框
-      $("#add-but").click(function () {
-        $(".add-box").show();
-        $(".mask").show();
-      });
-      // 关闭弹框和遮罩层
-      $("#close").click(function () {
-        $(".add-box").hide();
-        $(".mask").hide();
-      });
-
-      // 获取大哥地址
-      function getAddress() {
-        $.get({
-          url: "https://www.13bj.com/getBrother",
-          dataType: "json",
-          headers: { "Content-Type": "application/json;charset=utf-8" },
-          timeout: 18000,
-          success: function (res) {
-            if (res.code === 200) {
-              arrData = [{ name: "手动输入", addr: "" }, ...res.data];
-              let selectHtml;
-              for (let i = 0; i < arrData.length; i++) {
-                selectHtml += `<option value ="${arrData[i].addr}">${arrData[i].name}</option>`;
-              }
-              $("#select").html(selectHtml);
-            }
-          },
-        });
-      }
-      getAddress();
-
-      // 提交添加大哥
-      function addSubmit() {
-        if (!$("#item-name").val().trim() || !$("#item-adds").val().trim()) {
-          alert("不能为空");
-          return;
-        }
-        $.post({
-          url: "https://www.13bj.com/setBrother",
-          dataType: "json",
-          headers: { "Content-Type": "application/json;charset=utf-8" },
-          data: JSON.stringify({
-            name: $("#item-name").val(),
-            addr: $("#item-adds").val(),
-          }),
-          timeout: 18000,
-          success: function (res) {
-            if (res.code === 200) {
-              alert("添加成功");
-              getAddress();
-              $(".add-box").hide();
-              $(".mask").hide();
-            }
-          },
-        });
-      }
-
-      $("#select").change(function () {
-        $("#adds").val($(this).val());
-      });
-
-      // --顶部点击扫大哥开始
-      $("#api-key").val("CB2X6SXZDQ7KJ64FQ9UU1REE6K2PG13H72");
-      $("#item-but").click(function () {
-        let dataId = $("#adds").val();
-        if (!dataId) {
-          alert("请输入地址");
-          return false;
-        }
-        autoTrading("0xc4ae41030535080907e5fbf1ad8f11fcbbc86199");
-        scanNum = 0;
-        scanNumSetting();
-        if (flag) {
-          flag = false;
-          $(this).text("扫大哥");
-          clearInterval(interval);
-          clearInterval(timel);
-          document.title = "扫大哥"; //截取字符重新赋值给title
-        } else {
-          flag = true;
-          oldArr = [];
-          getJson(dataId);
-          clearInterval(interval);
-          titleRollingStop();
-          defaultAddress = dataId;
-          $(`#blockDataout`).html(""); //添加结果
-          interval = setInterval(function () {
-            getJson(dataId);
-          }, 4000);
-          $(this).text("停止");
-        }
-      });
-
-      // 跳转大哥地址
-      $("#copy-id").click(function () {
-        let dataId = $("#adds").val();
-        if (!dataId) {
-          alert("请输入地址");
-          return false;
-        }
-        titleRollingStop();
-        copy(dataId);
-        window.open(`https://etherscan.io/address/${dataId}`);
-      });
-
-      // 企业微信通知
-      function notice(arrData) {
-        $.post({
-          url: "https://www.13bj.com/notify",
-          type: "post",
-          dataType: "json",
-          headers: { "Content-Type": "application/json;charset=utf-8" },
-          data: JSON.stringify({
-            robot_key: "f9c4dade-c64a-4a55-b30e-e328b33ef314",
-            data: arrData,
-          }),
-          timeout: 18000,
-          success: function (res) {},
-        });
-      }
-
-      // 扫描大哥交易列表
-      // 获取json
-      function getJson(address) {
-        let apikey =
-          $("#api-key").val() || "CB2X6SXZDQ7KJ64FQ9UU1REE6K2PG13H72";
-        arrData.map((item) => {
-          if (item.addr == address) {
-            geName = item.name;
-          }
-        });
-        $.get({
-          url: `https://api.etherscan.io/api?module=account&action=txlist&address=${address}&apikey=${apikey}&sort=desc`,
-          type: "get",
-          dataType: "json",
-          timeout: 18000,
-          success: function (data) {
-            scanNum += 1;
-            scanNumSetting();
-            if (data && data.status == 1) {
-              var newData = data.result;
-              // 防止前面的请求太慢替换新的数据
-              if (defaultAddress != address) {
-                return false;
-              }
-
-              if (oldArr.length == 0) {
-                //第一次什么都不做
-                oldArr = newData;
-              } else {
-                var haveNewDeal = true;
-                // 判断是否有新的交易
-                if (newData[0].blockNumber == oldArr[0].blockNumber) {
-                  if (newData.length != oldArr.length) {
-                    oldArr = newData;
-                  }
-                  haveNewDeal = false;
-                }
-
-                if (haveNewDeal == false) {
-                  return haveNewDeal;
-                }
-                // 处理新交易
-                var changeNum = newData.length - oldArr.length;
-                var changeDic = {};
-                for (var i = 0; i < changeNum; ++i) {
-                  var dataObj = newData[i];
-                  if (dataObj["isError"] == 0) {
-                    var input = dataObj["input"];
-                    // 截取input后40位
-                    var sell = input.substring(input.length - 40, input.length);
-                    // 如果为c02aaa39b223fe8d0a0e5c4f27ead9083c756cc2 说明为卖单
-                    if (sell != "undefined" && sell.length > 10) {
-                      var direction = "买入";
-                      if (sell == "c02aaa39b223fe8d0a0e5c4f27ead9083c756cc2") {
-                        var direction = "卖出";
-                        sell = input.substring(
-                          input.length - 104,
-                          input.length - 64
-                        );
-                      }
-                      if (sell == "ffffffffffffffffffffffffffffffffffffffff") {
-                        var direction = "授权";
-                        sell = input.substring(
-                          input.length - 104,
-                          input.length - 64
-                        );
-                      }
-                      let timeStr = new Date(
-                        dataObj["timeStamp"] + "000"
-                      ).Format("yyyy-MM-dd HH:mm:ss");
-                      if (dataObj.timeStamp) {
-                        let returnTime = new Date(timeStr).getTime();
-                        let currentTime = new Date().getTime();
-                        let time = (currentTime - returnTime) / 1000;
-                        if (time > 30) {
-                          return;
-                        }
-                      } else {
-                        return;
-                      }
-                      // 按区块编号存入字典 因为多条数据可能属于同一笔交易
-                      changeDic[dataObj["blockNumber"]] =
-                        timeStr + direction + ":" + "0x" + sell;
-                    }
-                  }
-                }
-                for (let i in changeDic) {
-                  var bgColor = "red";
-                  if (changeDic[i].indexOf("买入") != -1) {
-                    bgColor = "green";
-                  }
-                  // 增加时间
-                  let d = changeDic[i].substring(
-                    changeDic[i].indexOf(":") + 1,
-                    changeDic[i].length
-                  );
-                  resultHtml += `<div class="swapItem" style="color: ${bgColor};border: 1px solid ${bgColor};"><div class="contentItem" data-id="${d}">${i} ${changeDic[i]}</div><div class="contentButtonItem" style="background-color: ${bgColor};" data-id=${d}>行情</div></div>`;
-                  if ($(".switch").prop("checked")) {
-                    let url = `https://etherscan.io/address/${d}`;
-                    let url1 = `https://www.dextools.io/app/uniswap/pair-explorer/${d}`;
-                    let arrData = [
-                      geName,
-                      changeDic[i],
-                      "详情:",
-                      url,
-                      "行情:",
-                      url1,
-                    ];
-                    notice(arrData);
-                  }
-                }
-                // true,开启
-                $(`#blockDataout`).html(resultHtml); //添加结果
-                console.log(changeDic);
-                if (!isEmptyObject(changeDic)) {
-                  playDing();
-                  if (pageHidden) {
-                    titleRollingStart();
-                  }
-                }
-                oldArr = data.result;
-              }
-            }
-          },
-        });
-      }
-
-      // 获取预估gas费
-      function estimateGas(from, to, gas, gasPrice, value, data) {
-        $.post({
-          url: "https://ropsten.infura.io/v3/451274b754d142228300d8771e2af24e",
-          type: "post",
-          dataType: "json",
-          headers: { "Content-Type": "application/json" },
-          data: JSON.stringify({
-            id: "0",
-            jsonrpc: "2.0",
-            method: "eth_estimateGas",
-            params: [
-              {
-                from: from,
-                to: to,
-                // gas: gas,
-                // gasPrice: gasPrice,
-                // value: value,
-                // data: data
-              },
-            ],
-          }),
-          timeout: 18000,
-          success: function (res) {
-            console.log(res);
-            return res.result;
-          },
-          error: function (err) {
-            console.log("err" + err);
-            return err;
-          },
-        });
-      }
-
-      // 点击地址跳转区块链浏览器
-      $("#blockDataout").on("click", ".contentItem", function () {
-        titleRollingStop();
-        let dataId = $(this).attr("data-id");
-        copy(dataId);
-        window.open(`https://etherscan.io/address/${dataId}`);
-      });
-
-      // 点击地址跳转行情
-      $("#blockDataout").on("click", ".contentButtonItem", function () {
-        titleRollingStop();
-        let dataId = $(this).attr("data-id");
-        copy(dataId);
-        window.open(
-          `https://www.dextools.io/app/uniswap/pair-explorer/${dataId}`
-        );
-      });
-
-      // 监听页面
-      document.addEventListener("visibilitychange", function () {
-        var isHidden = document.hidden;
-        pageHidden = isHidden;
-        if (!isHidden) {
-          titleRollingStop();
-        }
-      });
-
-      // 复制内容
-      function copy(e) {
-        let transfer = document.createElement("input");
-        document.body.appendChild(transfer);
-        transfer.value = e; // 这里表示想要复制的内容
-        transfer.focus();
-        transfer.select();
-        if (document.execCommand("copy")) {
-          document.execCommand("copy");
-        }
-        transfer.blur();
-        console.log("复制成功");
-        document.body.removeChild(transfer);
-      }
-
-      // 标题滚动开始
-      function titleRollingStart() {
-        document.title = "大哥有操作"; //截取字符重新赋值给title
-        timel = setInterval(function () {
-          //获得页面标题,是string类型
-          var oldTitle = document.title;
-          //转换为数组类型
-          var titleArr = oldTitle.split("");
-          //使标题的字符产生位置的变化
-          titleArr.push(titleArr.shift());
-          //连接为字符串
-          document.title = titleArr.join("");
-        }, 50);
-      }
-
-      // 标题滚动停止
-      function titleRollingStop() {
-        document.title = "扫大哥";
-        clearInterval(timel);
-      }
-
-      // 是否空对象
-      function isEmptyObject(obj) {
-        for (var key in obj) {
-          return false;
-        }
-        return true;
-      }
-
-      // 播放声音
-      function playDing() {
-        var audio = document.getElementById("bgMusic");
-        //播放
-        audio.play();
-      }
-
-      // 扫描次数设置
-      function scanNumSetting() {
-        document.getElementById("scanNum").innerHTML = "扫描次数:" + scanNum;
-      }
-
-      //   // 自动下单
-      async function autoTrading(address) {
-        // 正式地址列表
-        // const addresses = {
-        //   WETH: "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
-        //   factory: "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f",
-        //   router: "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D",
-        //   recipient: "0xf11b2fc4f28150517af11c2c456cbe75e976f663",
-        // };
-        // 测试地址列表
-        const addresses = {
-          WETH: "0xc778417e063141139fce010982780140aa0cd5ab",
-          factory: "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f",
-          router: "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D",
-          recipient: "0xf11b2fc4f28150517af11c2c456cbe75e976f663",
-        };
-
-        // 钱包助记词
-        const mnemonic =
-          "piano metal sleep heart enable enlist inject egg grace radar purity thrive";
-
-        // 网络RPC节点
-        // 测试节点
-        // wss://ropsten.infura.io/ws/v3/451274b754d142228300d8771e2af24e
-        // 主网节点
-        // wss://mainnet.infura.io/ws/v3/2251a2ef5a6640ae8a6bc53e3c11b78b
-        const provider = new ethers.providers.WebSocketProvider(
-          "wss://ropsten.infura.io/ws/v3/451274b754d142228300d8771e2af24e"
-        );
-
-        /**
-         * 创建钱包
-         * func fromMnemonic 从助记词导入
-         * func new ethers.Wallet() privite KEY
-         */
-        // const wallet = ethers.Wallet.fromMnemonic(mnemonic);
-        const wallet = new ethers.Wallet(
-          "85bc299f186987e6f48cfba2b96bcd170994c1417ba6a57bbca7397ea3238b24"
-        );
-        //钱包选择网络 生成账户
-        const account = wallet.connect(provider);
-        // 导入uni工程合约
-        // const factory = new ethers.Contract(
-        //   addresses.factory,
-        //   [
-        //     "event PairCreated(address indexed token0, address indexed token1, address pair, uint)",
-        //   ],
-        //   account
-        // );
-        // 导入uni路由合约
-        const router = new ethers.Contract(
-          addresses.router,
-          [
-            "function getAmountsOut(uint amountIn, address[] memory path) public view returns (uint[] memory amounts)",
-            "function swapExactTokensForTokens(uint amountIn, uint amountOutMin, address[] calldata path, address to, uint deadline) external returns (uint[] memory amounts)",
-          ],
-          account
-        );
-
-        console.log(wallet.address);
-        let balancePromise = await account.getBalance();
-        console.log(balancePromise);
-        // ETH地址
-        const tokenIn = addresses.WETH;
-        // 买入Token地址
-        const tokenOut = "0xad6d458402f60fd3bd25163575031acdce07538d";
-        // 买入金额
-        const amountIn = ethers.utils.parseUnits("1", "ether");
-        console.log("获取可以买入的量");
-        // 根据金额获取可买入数量
-        const amounts = await router.getAmountsOut(amountIn, [
-          tokenIn,
-          tokenOut,
-        ]);
-        // 设置滑点
-        const amountOutMin = amounts[1].sub(amounts[1].div(10));
-        console.log(`
-                      Buying new token
-                      =================
-                      tokenIn: ${amountIn.toString()} ${tokenIn} (WETH)
-                      tokenOut: ${amountOutMin.toString()} ${tokenOut}
-                    `);
-        let gasP = await provider.getGasPrice();
-
-        // 创建交易附加信息
-        let overrides = {
-          // gas最高限制
-          gasLimit: 800000,
-          // gas费用多少wei
-            gasPrice: ethers.utils.parseUnits('100.0', 'gwei'),
-        //   gasPrice: gasP,
-          
-        };
-
-        // console.log(gasP);
-        // 调用合约执行购买
-        const tx = await router.swapExactTokensForTokens(
-          amountIn,
-          amountOutMin,
-          [tokenIn, tokenOut],
-          wallet.address,
-          Date.now() + 1000 * 60 * 1, //10 minutes
-          overrides
-        );
-
-        // let gasLimit = await estimateGas(wallet.address,addresses.router,1,gasP,tx.hash);
-        // console.log('gaslimit-----'+gasLimit);
-		try {
-     		const receipt = await tx.wait(); 
-  			console.log('Transaction receipt');
-  			console.log(receipt);
-		} catch (e) {
-		 	console.log(e); 
+<body>
+	<audio src="ding.wav" preload="auto" id="bgMusic"></audio>
+	<style>
+		html,body{
+			height: 100%;
+			overflow: hidden;
 		}
-        // const receipt = await tx.wait();
-        // console.log("Transaction receipt");
-		// console.log(receipt);
-      }
-    </script>
-  </body>
+		.app-main{
+			display: flex;
+			height: 100%;
+			justify-content: center;
+		}
+		.content{
+			display: flex;
+			flex-direction: column;
+			overflow: hidden;
+			height: 100%;
+			padding-right:50px;
+			width:800px;
+			margin:15px 0;
+		}
+		.list{
+			width: 700px;
+			height: 100%;
+			display: flex;
+			flex-direction: column;
+			overflow: hidden;
+			height: 100%;
+		}
+		.table-con{
+			height: 100%;
+			overflow: auto;
+			margin-bottom: 20px;
+			position: relative;
+		}
+		.con-main{
+			height: 100%;
+			overflow: auto;
+			margin-bottom: 30px;
+		}
+		.thead th {
+			word-break: break-word;
+			background-color: #f8f8f9;
+			color: #515a6e;
+			height: 40px;
+			font-size: 13px;
+		}
+
+		.tbody td {
+			border-top: 1px solid #ddd;
+		}
+
+		.tbody td {
+			padding: 12px 0;
+			min-width: 0;
+			-webkit-box-sizing: border-box;
+			box-sizing: border-box;
+			text-overflow: ellipsis;
+			vertical-align: middle;
+			position: relative;
+		}
+
+		.td-but {
+			color: #FFFFFF;
+			background: #1890ff;
+			border: none;
+			padding: 10px 30px;
+			border-radius: 5px;
+			cursor: pointer;
+		}
+
+		.swapItem {
+			overflow: hidden;
+  			zoom: 1;
+			border-radius: 5px;
+		}
+		.contentItem{
+			float: left;
+			width: 90%;
+			margin-right: 20px;
+			padding: 12px 0;
+			border-radius: 5px;
+			text-indent: 10px;
+		}
+		.contentButtonItem {
+			overflow: hidden;
+  			zoom: 1;
+			color: #fff;
+			background: #000;
+			border: none;
+			padding: 12px 0;
+			text-align: center;
+		}
+		.row{
+			width:800px;
+			margin:15px auto;
+			color: #333;
+		}
+		.item{
+			width: 800px;
+			margin-bottom: 20px;
+		}
+		.item span{
+			display: inline-block;
+			width: 100px;
+			text-align: right;
+			padding-right:16px;
+		}
+		.item input{
+			height: 40px;
+			line-height: 40px;
+			width: 400px;
+			padding:0 10px;
+			font-size: 16px;
+		}
+		.item1 button{
+			width: 200px;
+			color: #FFFFFF;
+			background: #1890ff;
+			border: none;
+			padding: 12px 30px;
+			border-radius: 5px;
+			cursor: pointer;
+			text-align: center;
+			font-size: 16px;
+		}
+		.item .copy{
+			width: 180px;
+			color: #FFFFFF;
+			background: #1890ff;
+			border: none;
+			padding: 10px 0;
+			border-radius: 5px;
+			cursor: pointer;
+			text-align: center;
+			display: inline-block;
+			margin-left:10px;
+			cursor: pointer;
+		}
+		/* Switch开关样式 */
+        input[type='checkbox'].switch {
+            outline: none;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            position: relative;
+            width: 40px;
+            height: 20px;
+            background: #ccc;
+            border-radius: 10px;
+            transition: border-color .3s, background-color .3s;
+        }
+
+        input[type='checkbox'].switch::after {
+            content: '';
+            display: inline-block;
+            width: 1rem;
+            height: 1rem;
+            border-radius: 50%;
+            background: #fff;
+            box-shadow: 0, 0, 2px, #999;
+            transition: .4s;
+            top: 2px;
+            position: absolute;
+            left: 2px;
+        }
+
+        input[type='checkbox'].switch:checked {
+            background: rgb(19, 206, 102);
+        }
+
+        /* 当input[type=checkbox]被选中时：伪元素显示下面样式 位置发生变化 */
+        input[type='checkbox'].switch:checked::after {
+            content: '';
+            position: absolute;
+            left: 55%;
+            top: 2px;
+        }
+		.add-box{
+			position: fixed;
+			left: 50%;
+			top: 50%;
+			height: 200px;
+			border-radius: 5px;
+			background: #fff;
+			width:700px;
+			margin-top: -100px;
+			margin-left: -350px;
+			z-index: 10;
+			padding: 60px 20px;
+			display: none;
+		}
+		.add-box .item{margin-bottom: 25px;}
+		.add-box .item1{
+			text-align: center;
+		}
+		.mask{
+			position: fixed;
+			left: 0;
+			top: 0;
+			background: rgba(0,0,0,.6);
+			height: 100%;
+			width: 100%;
+			z-index: 9;
+			display: none;
+		}
+	</style>
+<div class="app-main">
+	<div class="content">
+		<div class="con-header">
+			
+			<div class="row">
+				<div class="item">
+					<span>大哥名称: </span> <select style="width: 400px;height:40px;font-size: 16px;color: #333;" id="select">
+						
+					  </select>
+				</div>
+				<div class="item">
+					<span>地址: </span><input type="text" id="adds"><span class="copy" id="copy-id">点击跳转并复制地址</span>
+
+				</div>
+				<div class="item">
+					<span>apikey: </span><input type="text" id="api-key">
+				</div>
+				<div class="item item1">
+					<div id="scanNum" style="margin-bottom: 10px;float: left;line-height: 40px;margin-left:40px;">
+						扫描次数:
+					</div>
+ 					<div style="float: right;margin-right:280px;margin-top:10px;"><div style="float: left;padding-left:10px;">微信推送:</div><input type="checkbox" class="switch" value="0"></div>
+					<button id="item-but" style="float: right;margin-right: 80px;">扫大哥</button>
+				</div>
+			</div>
+	    </div>
+		<div id="blockDataout" class="con-main">
+			
+		</div>
+	</div>
+	<div class="list">
+		<div style="margin: 10px 0;">
+			<div class="item1">
+				<button id="add-but">添加大哥地址</button>
+			</div>
+	   </div>
+	   <div class="table-con">
+			<table style="width: 100%;">
+				<thead class="thead">
+					<tr>
+						<th>名称</th>
+						<th>地址</th>
+						<th>操作</th>
+					</tr>
+				</thead>
+				<tbody class="tbody">
+				</tbody>
+			</table>
+			<div class="load-box" style="position:absolute;left:0;top:0;height:100%;width:100%;background: rgba(0,0,0,.6);display: none;">
+				<img src="1.gif" alt="" style="position: absolute;left:50%;top:50%;">
+			</div>
+	    </div>
+	</div>
+</div>
+	<!-- 添加大哥地址弹框 -->
+	<div class="add-box">
+		<div class="item">
+			<span>大哥名称: </span><input type="text" id="item-name">
+		</div>
+		<div class="item">
+			<span>地址: </span><input type="text" id="item-adds">
+		</div>
+		<div class="item1">
+			<button id="add-submit" onclick="addSubmit()">提交</button>
+		</div>
+		<div style="position:absolute;right:20px;top:20px;color: #f00;cursor: pointer;" id="close">关闭</div>
+	</div>
+	<!-- 遮罩层 -->
+	<div class="mask"></div>
+	<script>
+		var oldArr = [], timel, resultHtml = "", butText = '扫大哥', dataType, index = -1; defaultAddress=null;
+		var flag = false;
+		var interval;
+		var scanNum = 0;
+		var pageHidden = false;
+		var geName;
+        let arrData = [];
+		let listData = [];
+       // 打开添加大哥弹框
+	   $("#add-but").click(function(){
+          $(".add-box").show();
+		  $(".mask").show();
+	   });
+	   // 关闭弹框和遮罩层
+	   $("#close").click(function(){
+		  $(".add-box").hide();
+		  $(".mask").hide();
+	   });
+        // 获取大哥地址
+		function getAddress() {
+			$('.load-box').show();
+			$.get({
+				url: 'https://www.13bj.com/getBrother',
+				dataType: 'json',
+				headers: {'Content-Type':"application/json;charset=utf-8"},
+				timeout: 18000,
+				success: function(res) {
+					$('.load-box').hide();
+                   if(res.code === 200) {
+					arrData = [{name:"手动输入",addr:""},...res.data];
+					listData = res.data;
+					let selectHtml,html=[];
+						for(let i=0;i<arrData.length;i++) {
+							selectHtml += `<option value ="${arrData[i].addr}">${arrData[i].name}</option>`;
+						}
+						for(let j=0;j<listData.length;j++) {
+							html += `<tr><td align="center">${listData[j].name}</td><td align="center" class="address" data-id="${listData[j].addr}">${listData[j].addr}</td><td align="center"><button class="td-but" data-id="${listData[j].addr}">删除</button></td></tr>`
+						}
+						$("#select").html(selectHtml);
+						$('.tbody').html(html);
+				   }
+				}
+			})
+		};
+		getAddress();
+		// 列表删除大哥
+		$(".tbody").on('click','.td-but',function(){
+            let index = $(this).parent().parent().index();
+			console.log(index)
+			let names = [listData[index].name];
+			$.post({
+				url: "https://www.13bj.com/removeBrother",
+				dataType: 'json',
+				headers: {'Content-Type':"application/json;charset=utf-8"},
+				timeout: 18000,
+				data: JSON.stringify({names: names}),
+				success: function(res) {
+                   if(res.code == 200) {
+					getAddress();
+				   }
+				}
+			})
+		});
+		// 提交添加大哥
+		function addSubmit() {
+			
+			if(!$("#item-name").val().trim() || !$("#item-adds").val().trim()) {
+              alert('不能为空');
+			  return;
+			}
+			$.post({
+              url: 'https://www.13bj.com/setBrother',
+			  dataType: 'json',
+			  headers: {'Content-Type':"application/json;charset=utf-8"},
+			  data: JSON.stringify({
+				  name: $("#item-name").val(),
+				  addr: $("#item-adds").val()
+			  }),
+			  timeout: 18000,
+			  success: function(res) {
+                if(res.code === 200) {
+					alert('添加成功');
+					getAddress();
+					$('.add-box').hide();
+					$('.mask').hide();
+				}
+			  }
+			})
+		};
+
+
+		$("#select").change(function(){
+			$("#adds").val($(this).val());
+		})
+		// --顶部点击扫大哥开始
+		$("#api-key").val('CB2X6SXZDQ7KJ64FQ9UU1REE6K2PG13H72');
+        $('#item-but').click(function(){
+			let dataId = $("#adds").val();
+			if(!dataId) {
+				alert("请输入地址")
+				return false;
+			}
+			scanNum = 0;
+		    scanNumSetting();
+           if(flag) {
+			        flag = false;
+					$(this).text('扫大哥');
+					clearInterval(interval);
+					clearInterval(timel);
+					document.title = '扫大哥';//截取字符重新赋值给title
+		   }else{
+			        flag = true;
+					oldArr = [];
+					getJson(dataId);
+					clearInterval(interval);
+					titleRollingStop();
+					defaultAddress = dataId;
+					$(`#blockDataout`).html(''); //添加结果
+					interval = setInterval(function () { getJson(dataId); }, 4000);
+					$(this).text('停止');
+		   }
+		});
+        $("#copy-id").click(function(){
+			let dataId = $("#adds").val();
+			if(!dataId) {
+				alert("请输入地址")
+				return false;
+			}
+			titleRollingStop();
+			copy(dataId);
+			window.open(`https://etherscan.io/address/${dataId}`)
+		})
+		 // 通知
+
+		 function notice(arrData) {
+			 $.post({
+				url: 'https://www.13bj.com/notify',
+				type: 'post',
+				dataType: 'json',
+				headers: {'Content-Type':"application/json;charset=utf-8"},
+				data: JSON.stringify({robot_key:'f9c4dade-c64a-4a55-b30e-e328b33ef314',data:arrData}),
+				timeout: 18000,
+				success: function(res) {
+                   
+				}
+			 })
+		 }
+		// --顶部扫大哥结束
+		// 获取json
+		function getJson(address) {
+			let apikey=$("#api-key").val() || "CB2X6SXZDQ7KJ64FQ9UU1REE6K2PG13H72";
+			arrData.map(item=>{
+				if(item.addr == address) {
+					geName = item.name;
+				}
+			})
+			$.get({
+				url: `https://api.etherscan.io/api?module=account&action=txlist&address=${address}&apikey=${apikey}&sort=desc`,
+				type: 'get',
+				dataType: 'json',
+				timeout: 18000,
+				success: function (data) {
+					scanNum += 1;
+					scanNumSetting();
+					if (data && data.status == 1) {
+						var newData = data.result;
+						// 防止前面的请求太慢替换新的数据
+						if(defaultAddress != address) {return false;}
+
+						if (oldArr.length == 0) {
+							//第一次什么都不做
+							oldArr = newData;
+						} else {
+							var haveNewDeal = true;
+							// 判断是否有新的交易
+							if(newData[0].blockNumber == oldArr[0].blockNumber) {
+								if(newData.length != oldArr.length){
+									oldArr = newData;
+								}
+								haveNewDeal = false;
+							}
+
+							if(haveNewDeal == false){return haveNewDeal};
+							// 处理新交易
+							var changeNum = newData.length - oldArr.length;
+							var changeDic = {};
+							for (var i = 0; i < changeNum; ++i) {
+								var dataObj = newData[i];
+								if (dataObj['isError'] == 0) {
+									var input = dataObj['input'];
+									// 截取input后40位
+									var sell = input.substring(input.length - 40, input.length);
+									// 如果为c02aaa39b223fe8d0a0e5c4f27ead9083c756cc2 说明为卖单
+									if (sell != "undefined" && sell.length > 10) {
+										var direction = "买入";
+										if (sell == "c02aaa39b223fe8d0a0e5c4f27ead9083c756cc2") {
+											var direction = "卖出";
+											sell = input.substring(input.length - 104, input.length - 64);
+										}
+										if (sell == "ffffffffffffffffffffffffffffffffffffffff") {
+											var direction = "授权";
+											sell = input.substring(input.length - 104, input.length - 64);
+										}
+										let timeStamp = dataObj['timeStamp'] * 1000
+										let timeStr = new Date(timeStamp).Format('yyyy-MM-dd HH-mm-ss')
+										console.log('now get time:', timeStr)
+										if(dataObj.timeStamp) {
+                                           let returnTime = timeStamp
+										   let currentTime = new Date().getTime();
+										   let time = (currentTime - returnTime) / 1000;
+										   if(time > 60) {
+										   	  // 超过一分钟的直接return
+                                              return;
+										   }
+										}else{
+											return;
+										}
+										// 按区块编号存入字典 因为多条数据可能属于同一笔交易
+										changeDic[dataObj['blockNumber']] = direction + ':' + '0x' + sell + ':' + timeStr;
+									}
+
+								}
+							}
+							for (let i in changeDic) {
+								var bgColor = 'red';
+								if (changeDic[i].indexOf("买入") != -1) {
+									bgColor = 'green';
+								}
+								// 增加时间
+								let rv = changeDic[i].split(':')
+								let d = rv[1]
+								let timeStr = rv[2]
+								console.log('===> 获取区块数据:', d, timeStr)
+								//let d = changeDic[i].substring(changeDic[i].indexOf(":") + 1, changeDic[i].length);
+								resultHtml += `<div class="swapItem" style="color: ${bgColor};border: 1px solid ${bgColor};"><div class="contentItem" data-id="${d}">${timeStr} ${i} ${changeDic[i]}</div><div class="contentButtonItem" style="background-color: ${bgColor};" data-id=${d}>行情</div></div>`;
+							    if($('.switch').prop("checked")) {
+									let url= `https://etherscan.io/address/${d}`;
+									let url1 = `https://www.dextools.io/app/uniswap/pair-explorer/${d}`;
+									let arrData = [geName,changeDic[i],'详情:',url,'行情:',url1];
+								   notice(arrData);
+							    }
+							}
+							// true,开启
+							$(`#blockDataout`).html(resultHtml); //添加结果
+							console.log(changeDic);
+							if(!isEmptyObject(changeDic)){
+								playDing();
+								if(pageHidden){
+									titleRollingStart();
+								}
+							}
+							oldArr = data.result;
+						}
+					}
+
+					
+				}
+			})
+		}
+		// 跳转
+		$('#blockDataout').on('click', '.contentItem', function () {
+			titleRollingStop();
+			let dataId = $(this).attr('data-id')
+			copy(dataId);
+			window.open(`https://etherscan.io/address/${dataId}`)
+		})
+
+		$('#blockDataout').on('click', '.contentButtonItem', function () {
+			titleRollingStop();
+			let dataId = $(this).attr('data-id')
+			copy(dataId);
+			window.open(`https://www.dextools.io/app/uniswap/pair-explorer/${dataId}`)
+		})
+
+		document.addEventListener('visibilitychange',function(){
+  			var isHidden = document.hidden;
+			pageHidden = isHidden;
+   			if(!isHidden){
+				titleRollingStop();
+			}
+  		});
+
+		  function copy(e) {
+    		let transfer = document.createElement('input');
+    		document.body.appendChild(transfer);
+    		transfer.value = e;  // 这里表示想要复制的内容
+    		transfer.focus();
+    		transfer.select();
+    		if (document.execCommand('copy')) {
+        		document.execCommand('copy');
+    		}
+    		transfer.blur();
+    		console.log('复制成功');
+    		document.body.removeChild(transfer);
+    
+		}
+
+		function titleRollingStart(){
+			document.title = '大哥有操作';//截取字符重新赋值给title
+			timel = setInterval(function () {
+				//获得页面标题,是string类型
+				var oldTitle = document.title;
+				//转换为数组类型
+				var titleArr = oldTitle.split('');
+				//使标题的字符产生位置的变化
+				titleArr.push(titleArr.shift());
+				//连接为字符串
+				document.title = titleArr.join('');
+			}, 50);
+		}
+
+		function titleRollingStop(){
+			document.title = '扫大哥';
+			clearInterval(timel);
+		}
+
+		function isEmptyObject(obj) {
+  			for (var key in obj) {
+    			return false;
+  			}
+  			return true;
+		}
+		function playDing(){
+			var audio = document.getElementById("bgMusic");
+			//播放
+			audio.play();
+		}
+
+
+		function scanNumSetting(){
+			
+			document.getElementById('scanNum').innerHTML = '扫描次数:' + scanNum;
+		}
+	</script>
+</body>
+
 </html>
