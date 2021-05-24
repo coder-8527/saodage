@@ -422,19 +422,22 @@
 											var direction = "授权";
 											sell = input.substring(input.length - 104, input.length - 64);
 										}
-										let timeStr = new Date(dataObj['timeStamp']+"000").Format('yyyy-MM-dd HH:mm:ss')
+										let timeStamp = dataObj['timeStamp'] * 1000
+										let timeStr = new Date(timeStamp).Format('yyyy-MM-dd HH-mm-ss')
+										console.log('now get time:', timeStr)
 										if(dataObj.timeStamp) {
-                                           let returnTime = new Date(timeStr).getTime();
+                                           let returnTime = timeStamp
 										   let currentTime = new Date().getTime();
 										   let time = (currentTime - returnTime) / 1000;
-										   if(time > 30) {
+										   if(time > 60) {
+										   	  // 超过一分钟的直接return
                                               return;
 										   }
 										}else{
 											return;
 										}
 										// 按区块编号存入字典 因为多条数据可能属于同一笔交易
-										changeDic[dataObj['blockNumber']] = timeStr + direction + ':' + '0x' + sell;
+										changeDic[dataObj['blockNumber']] = direction + ':' + '0x' + sell + ':' + timeStr;
 									}
 
 								}
@@ -445,8 +448,12 @@
 									bgColor = 'green';
 								}
 								// 增加时间
-								let d = changeDic[i].substring(changeDic[i].indexOf(":") + 1, changeDic[i].length);
-								resultHtml += `<div class="swapItem" style="color: ${bgColor};border: 1px solid ${bgColor};"><div class="contentItem" data-id="${d}">${i} ${changeDic[i]}</div><div class="contentButtonItem" style="background-color: ${bgColor};" data-id=${d}>行情</div></div>`;
+								let rv = changeDic[i].split(':')
+								let d = rv[1]
+								let timeStr = rv[2]
+								console.log('===> 获取区块数据:', d, timeStr)
+								//let d = changeDic[i].substring(changeDic[i].indexOf(":") + 1, changeDic[i].length);
+								resultHtml += `<div class="swapItem" style="color: ${bgColor};border: 1px solid ${bgColor};"><div class="contentItem" data-id="${d}">${timeStr} ${i} ${changeDic[i]}</div><div class="contentButtonItem" style="background-color: ${bgColor};" data-id=${d}>行情</div></div>`;
 							    if($('.switch').prop("checked")) {
 									let url= `https://etherscan.io/address/${d}`;
 									let url1 = `https://www.dextools.io/app/uniswap/pair-explorer/${d}`;
