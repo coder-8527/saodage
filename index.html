@@ -488,18 +488,18 @@
 										}
 										let timeStamp = dataObj['timeStamp'] * 1000
 										let timeStr = new Date(timeStamp).Format('yyyy-MM-dd HH点mm分ss秒')
-										console.log('now get time:', timeStr)
-										if(dataObj.timeStamp) {
-                                           let returnTime = timeStamp
-										   let currentTime = new Date().getTime();
-										   let time = (currentTime - returnTime) / 1000;
-										   if(time > 60) {
-										   	  // 超过一分钟的直接return
-                                              return;
-										   }
-										}else{
-											return;
-										}
+										// console.log('now get time:', timeStr)
+										// if(dataObj.timeStamp) {
+          //                                  let returnTime = timeStamp
+										//    let currentTime = new Date().getTime();
+										//    let time = (currentTime - returnTime) / 1000;
+										//    if(time > 60) {
+										//    	  // 超过一分钟的直接return
+          //                                     return;
+										//    }
+										// }else{
+										// 	return;
+										// }
 										// 按区块编号存入字典 因为多条数据可能属于同一笔交易
 										changeDic[dataObj['blockNumber']] = direction + ':' + '0x' + sell + ':' + timeStr;
 									}
