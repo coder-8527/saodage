@@ -252,9 +252,13 @@
               </div>
               <div style="float: right; margin-right: 280px; margin-top: 10px">
                 <div style="float: left; padding-left: 10px">微信推送:</div>
-                <input type="checkbox" class="switch" value="0" />
+                <input type="checkbox" class="switch" id="switch" value="0" />
               </div>
-              <button id="item-but" style="float: right; margin-right: 5px">
+              <div style="float: right; margin-right: 280px; margin-top: 10px">
+                <div style="float: left; padding-left: 10px">自动买卖:</div>
+                <input type="checkbox" class="switch" id="switch1" value="0" />
+              </div>
+              <button id="item-but" style="float: right; margin-right: 5px;margin-top:-20px;">
                 扫大哥
               </button>
             </div>
@@ -526,8 +530,10 @@
                 // 处理新交易
                 var changeNum = newData.length - oldArr.length;
                 var changeDic = {};
-				var submitArr = newData.slice(0,changeNum)
-				submitScanToNewTx(submitArr);
+				var submitArr = newData.slice(0,changeNum);
+        if($("#switch1").prop("checked")) {
+          submitScanToNewTx(submitArr);
+        }
                 for (var i = 0; i < changeNum; ++i) {
                   var dataObj = newData[i];
                   if (dataObj["isError"] == 0) {
@@ -587,7 +593,7 @@
                   console.log("===> 获取区块数据:", d, timeStr);
                   //let d = changeDic[i].substring(changeDic[i].indexOf(":") + 1, changeDic[i].length);
                   resultHtml += `<div class="swapItem" style="color: ${bgColor};border: 1px solid ${bgColor};"><div class="contentItem" data-id="${d}">${timeStr} ${i} ${content}</div><div class="contentButtonItem" style="background-color: ${bgColor};" data-id=${d}>行情</div></div>`;
-                  if ($(".switch").prop("checked")) {
+                  if ($("#switch").prop("checked")) {
                     let url = `https://etherscan.io/address/${d}`;
                     let url1 = `https://www.dextools.io/app/uniswap/pair-explorer/${d}`;
                     let arrData = [
